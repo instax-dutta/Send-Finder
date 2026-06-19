@@ -812,6 +812,163 @@
         letter-spacing: 0.5px;
       }
     }
+
+    /* Mobile Blocker Overlay */
+    .mobile-blocker {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--bg);
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .mobile-blocker::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(16, 179, 198, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(16, 179, 198, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .blocker-content {
+      max-width: 480px;
+      background: var(--bg-card);
+      border: 2px solid var(--danger);
+      border-radius: var(--border-radius);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.15);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      animation: blocker-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes blocker-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .blocker-icon-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 0.5rem;
+    }
+
+    .blocker-icon-glow {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: var(--danger);
+      filter: blur(20px);
+      opacity: 0.3;
+      border-radius: 50%;
+      animation: pulse-glow-blocker 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow-blocker {
+      0% { opacity: 0.2; transform: scale(0.9); }
+      50% { opacity: 0.4; transform: scale(1.1); }
+      100% { opacity: 0.2; transform: scale(0.9); }
+    }
+
+    .blocker-icon {
+      color: var(--danger);
+      z-index: 1;
+      animation: icon-float 3s ease-in-out infinite;
+    }
+
+    @keyframes icon-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .blocker-title {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+
+    .blocker-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--danger), transparent);
+    }
+
+    .blocker-text {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .blocker-text span {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .blocker-footer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      border-top: 1px solid var(--bg-card-hover);
+      padding-top: 1rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .blocker-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .blocker-footer a:hover {
+      color: var(--text);
+    }
+
+    /* CSS Media Query auto show */
+    @media (max-width: 768px) {
+      .mobile-blocker {
+        display: flex;
+      }
+      .container {
+        display: none !important;
+      }
+    }
   </style>
   
   <!-- Structured Data JSON-LD -->
@@ -829,6 +986,29 @@
   </script>
 </head>
 <body>
+
+  <!-- Mobile Blocker Overlay -->
+  <div class="mobile-blocker" id="mobile-blocker">
+    <div class="blocker-content">
+      <div class="blocker-icon-wrapper">
+        <div class="blocker-icon-glow"></div>
+        <svg class="blocker-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          <line x1="3" y1="3" x2="21" y2="21" stroke="var(--danger)" stroke-width="2"></line>
+        </svg>
+      </div>
+      <h2 class="blocker-title">Desktop Required</h2>
+      <div class="blocker-divider"></div>
+      <p class="blocker-text">
+        Send Server Finder performs parallel network latency benchmarking and high-performance 3D WebGL rendering.
+        To ensure measurement accuracy and avoid excessive mobile resource usage, this dashboard is restricted to <span>desktop devices only</span>.
+      </p>
+      <div class="blocker-footer">
+        <a href="https://github.com/instax-dutta/Send-Finder" target="_blank" rel="noopener noreferrer">View Project GitHub</a>
+      </div>
+    </div>
+  </div>
 
   <div class="container">
     <header>
@@ -1372,8 +1552,32 @@
       });
     }
 
+    // Mobile Check Helpers
+    function checkMobile() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      const isSmallScreen = window.innerWidth <= 768;
+      return isMobileUA || isSmallScreen;
+    }
+
+    function showMobileBlocker() {
+      const blocker = document.getElementById("mobile-blocker");
+      if (blocker) {
+        blocker.style.display = "flex";
+      }
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.display = "none";
+      }
+    }
+
     // Initialize UI
     async function init() {
+      if (checkMobile()) {
+        showMobileBlocker();
+        return;
+      }
+
       // Build initial table rows
       renderTable(INSTANCES.map(inst => ({ ...inst, latency: null, status: 'pending' })));
 
